@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+# add the missing service from CE
+- report-service.yaml
+# an upstream fork of thingsboard that has a kustomization.yaml
+- git@github.com:thingsboard/thingsboard.git//k8s
+# # # The upstream should have the following kustomization.yaml
+# # # resources:
+# # # - postgres.yml
+# # # - tb-node-postgres-configmap.yml
+# # # - database-setup.yml
+# # # - tb-node-configmap.yml
+# # # - tb-mqtt-transport-configmap.yml
+# # # - tb-http-transport-configmap.yml
+# # # - tb-coap-transport-configmap.yml
+# # # - thingsboard.yml
+# # # namespace: stg-tb
+namespace: stg-tb
+patchesStrategicMerge:
+# A patch to set REPORTS_SERVER_ENDPOINT_URL in tb-node
+- patch.yaml
+images:
+- name: thingsboard/tb-coap-transport:latest
+  newName: store/thingsboard/tb-pe-coap-transport
+  newTag: 2.4.0PE
+- name: thingsboard/tb-http-transport:latest
+  newName: store/thingsboard/tb-pe-http-transport
+  newTag: 2.4.0PE
+- name: thingsboard/tb-mqtt-transport:latest
+  newName: store/thingsboard/tb-pe-mqtt-transport
+  newTag: 2.4.0PE
+- name: thingsboard/tb-node:latest
+  newName: store/thingsboard/tb-pe-node
+  newTag: 2.4.0PE
+- name: thingsboard/tb-web-ui:latest
+  newName: store/thingsboard/tb-pe-web-ui
+  newTag: 2.4.0PE
+- name: thingsboard/tb-js-executor
+  newName: store/thingsboard/tb-pe-js-executor
+  newTag: 2.4.0PE

@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tb-web-report
+spec:
+  selector:
+    matchLabels:
+      app: tb-web-report
+  template:
+    metadata:
+      labels:
+        app: tb-web-report
+    spec:
+      containers:
+      - name: tb-web-report
+        image: rwcrdevops.azurecr.io/tb-pe-web-report:2.4.0PE
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8383
+        env:
+          - name: HTTP_BIND_ADDRESS
+            value: "0.0.0.0"
+          - name: HTTP_BIND_PORT
+            value: "8383"
+          - name: LOGGER_LEVEL
+            value: debug
+          - name: LOG_FOLDER
+            value: logs
+          - name: LOGGER_FILENAME
+            value: tb-web-report-%DATE%.log
+          - name: DOCKER_MODE
+            value: "true"
+            name: DEFAULT_PAGE_NAVIGATION_TIMEOUT
+            value: "120000"
+            name: DASHBOARD_LOAD_WAIT_TIME
+            value: "3000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tb-web-report
+spec:
+  selector:
+    app: tb-web-report
+  ports:
+  - port: 8383
+    targetPort: 8383
